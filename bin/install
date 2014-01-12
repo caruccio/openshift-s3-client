@@ -1,0 +1,16 @@
+#!/bin/bash -eu
+
+case "$1" in
+	-v|--version)
+		version="$2"
+esac
+
+if bin/0.0.1/bin/request-s3-credentials; then
+	cat <<-EOF
+		Your AWS S3 credentials:
+
+		AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+		AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+		AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION
+	EOF
+fi

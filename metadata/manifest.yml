@@ -1,0 +1,32 @@
+Name: s3-client
+Cartridge-Short-Name: S3_CLIENT
+Display-Name: Amazon S3 Client
+Description: "Privides credentials to AWS S3"
+Version: '0.0.1'
+Versions: [ '0.0.1' ]
+License: "Apache License version 2.0"
+License-Url: http://www.apache.org/licenses/LICENSE-2.0.html
+Vendor: The Apache Software Foundation
+Cartridge-Version: 0.0.1
+Compatible-Versions: []
+Cartridge-Vendor: getup
+Categories:
+  - service
+  - domain_scope
+Website: http://aws.amazon.com/s3/
+Cart-Data:
+  - Key: AWS_DEFAULT_REGION
+    Type: environment
+    Description: "Provides the AWS region to use."
+  - Key: AWS_ACCESS_KEY_ID
+    Type: environment
+    Description: "Provides the value of the AWS access key."
+  - Key: AWS_SECRET_ACCESS_KEY
+    Type: environment
+    Description: "Provides the value of the AWS secret access key."
+Provides:
+  - "s3client"
+  - s3client-0.0.1
+Scaling:
+  Min: 1
+  Max: 1
