@@ -15,6 +15,9 @@ Categories:
   - domain_scope
 Website: http://aws.amazon.com/s3/
 Cart-Data:
+  - Key: OPENSHIFT_S3_LOG_DIR
+    Type: environment
+    Description: "Directory containing log files."
   - Key: AWS_DEFAULT_REGION
     Type: environment
     Description: "Provides the AWS region to use."
