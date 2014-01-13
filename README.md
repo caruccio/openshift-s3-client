@@ -1,52 +1,145 @@
-# OpenShift ElasticSearch Cartridge
+# OpenShift S3 Client (S3C)
 
-Running scalable ElasticSearch on OpenShift.
+This cartridge ask a central authority for S3 credentials, exporting thoses credentials as environment variables.
 
-The first gear is the master and data node. All other gears will play the data-only
-node role. In order to create data-only nodes, simply scale-up your app.
+This is a first initial testing relase, so do no even try to use it.
 
-## Usage
+I'm putting it here expeting some feedback and ideas on how to implement in a secure way.
+Please, contributions are very welcome.
 
-First of all, create your account on Getup Cloud: http://getupcloud.com.
-It is free and gives a 750h trial period.
+## Architecture
 
-Let's start by creating a new ES app called `elastic`:
+There are 2 components:
+
+### S3 Client (this cartridge)
+
+Requests a credential server for S3 credentials.
+Those credentials will be generated on-the-fly.
+
+After created, they are published to all cartridges as environment variables:
+
+- AWS_ACCESS_KEY_ID
+- AWS_SECRET_ACCESS_KEY
+- AWS_BUCKET_NAME
+
+### Credential Server (CS)
+
+- Receive the credentials request and authenticate.
+- Asks AWS for IAM credentials (under provider's account).
+- Register cartridge usage
+
+Credential Server API exposes a RESTful interface as follow:
 
 ```
-$ rhc app create -s elastic https://reflector-getupcloud.getup.io/reflect?github=caruccio/openshift-elasticsearch
-$ cd elastic
+https://<server-addr>/<provider>/<service>
 ```
 
-Point your browser to [http://elastic-$namespace.getup.io](http://elastic-$namespace.getup.io) to see it in action.
-You can contemplate your "cluster" in [http://elastic-$namespace.getup.io/_cluster/nodes/stats?plugins=true](http://elastic-$namespace.getup.io/_cluster/nodes/stats?plugins=true).
-_(Look mom! I've built a cluster of a single node!)_
-
-To add 4 more data-only ES instances, simply add more gears:
+For example, to request a AWS S3 credential the request URL should be:
 
 ```
-$ rhc cartridge-scale elasticsearch 4 -a elastic
+https:/<server-addr>/aws/s3
 ```
 
-Now you can be proud and show off with your amazing pile of pure distributed-real-time-analytics-multi-tenant-document-oriented-restful-schema-free-per-operation-persistent-open-source-o-matic server.
+### Authentication
 
-## Plugins
+Upon installation, S3C creates a file inside the main app gear containing a random generated salt, used to sign the request.
+This file is located at `$OPENSHIFT_S3_CLIENT_DIR/.salt`.
 
-The app is created with 3 installed plugins by default:
+The request itself is a plain text POST containing some environment variables from gear and a hash of the entire message.
+The format of the message is as follow:
 
-* [mobz/elasticsearch-head](http://mobz.github.io/elasticsearch-head)
-* [karmi/elasticsearch-paramedic](https://github.com/karmi/elasticsearch-paramedic)
-* [polyfractal/elasticsearch-inquisitor](https://github.com/polyfractal/elasticsearch-inquisitor)
+```
+$OPENSHIFT_GEAR_UUID|$OPENSHIFT_APP_DNS|$OPENSHIFT_S3_CLIENT_DIR|<MESSAGE-HASH>
+```
 
-In order to install/remove plugins, edit file `plugins.txt`, commit and push.
-If your plugin needs a full URL to download its code from, use `NAME=URL` to specify it.
-All plugins are installed on all gears.
+For example, given following salt value `SALT=d72ebd92de8230e4`, one can generate <MESSAGE-HASH> with:
 
-## Contributions
+```
+echo "$OPENSHIFT_GEAR_UUID|$OPENSHIFT_APP_DNS|$OPENSHIFT_S3_CLIENT_DIR|$SALT" | sha256sum
+8b7b830cd1ec536a5f681947c3b28857d63845fcc07eb0ddf57d12fe2ce20137 -
+```
 
-Please, anything...
+The message will looks like this:
 
-Here are some suggestions:
+```
+52b5bfbda665b7779400004f|myapp-example.getup.io|/var/lib/openshift/52b5bfbda665b7779400004f/|8b7b830cd1ec536a5f681947c3b28857d63845fcc07eb0ddf57d12fe2ce20137
+```
 
-* Download and install elasticsearch source on-the-fly
-* User can choose what version it wants to run
-* Better (?) cluster topology
+After reading the message, CS then tries to authenticate it. First, it reads the salt file inside the gear (content from $OPENSHIFT_S3_CLIENT_DIR/.salt).
+With that value, it then re-generate the signature using the values from request. If values match than it is authenticated an processing continues. If not, the connection is dropped with a proper error message.
+
+### Credentials creation
+
+Each provider has a different way to create credentials. For instance, we will start implementing only AWS S3 credentials, which uses a service called [IAM](http://aws.amazon.com/iam/).
+This service allows for a main account to create different credentials for different services provided by AWS. There will be a map of each user application to a distinct AWS account.
+
+To create a new user credential:
+
+- Using vendor's credentials, request a new IAM user and access key.
+- Attach restrictive policy to new user, allowing S3 access only without bucket delete permission.
+- Register this new resource for billing (maybe into mongodb usage_record?)
+- Return username, access key and bucket name.
+
+Example routine to create IAM user and key:
+
+```python
+from boto import iam
+from datetime import datetime
+from json import dumps
+
+def create_aim_user(vendor_key_id, vendor_access_key, openshift_app_uuid):
+	client = iam.connection.IAMConnection(vendor_key_id, vendor_access_key)
+	user   = c.create_user(openshift_app_uuid)
+	key    = c.create_access_key(openshift_app_uuid)
+	policy = {
+		"Statement": [
+			{
+				"Sid": "Stmt{0}-{1}".format(openshift_app_uuid, datetime.strftime(datetime.utcnow(), '%s')),
+				"Effect": "Allow",
+				"Action": [
+					"s3:AbortMultipartUpload",
+					"s3:DeleteBucketPolicy",
+					"s3:DeleteBucketWebsite",
+					"s3:DeleteObject",
+					"s3:DeleteObjectVersion",
+					"s3:GetBucketAcl",
+					"s3:GetBucketLocation",
+					"s3:GetBucketLogging",
+					"s3:GetBucketNotification",
+					"s3:GetBucketPolicy",
+					"s3:GetBucketRequestPayment",
+					"s3:GetBucketTagging",
+					"s3:GetBucketVersioning",
+					"s3:GetBucketWebsite",
+					"s3:GetLifecycleConfiguration",
+					"s3:GetObject",
+					"s3:GetObjectAcl",
+					"s3:GetObjectTorrent",
+					"s3:GetObjectVersion",
+					"s3:GetObjectVersionAcl",
+					"s3:GetObjectVersionTorrent",
+					"s3:ListBucket",
+					"s3:ListBucketMultipartUploads",
+					"s3:ListBucketVersions",
+					"s3:ListMultipartUploadParts",
+					"s3:PutBucketAcl",
+					"s3:PutBucketLogging",
+					"s3:PutBucketNotification",
+					"s3:PutBucketPolicy",
+					"s3:PutBucketRequestPayment",
+					"s3:PutBucketTagging",
+					"s3:PutBucketVersioning",
+					"s3:PutBucketWebsite",
+					"s3:PutLifecycleConfiguration",
+					"s3:PutObject",
+					"s3:PutObjectAcl",
+					"s3:PutObjectVersionAcl"
+				],
+				"Resource": [
+					"arn:aws:s3:::{0}/*".format(openshift_app_uuid)
+				]
+			}
+		]
+	}
+	client.put_user_policy(openshift_app_uuid, 'default', dumps(policy, indent=3))
+```

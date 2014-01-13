@@ -12,7 +12,6 @@ Compatible-Versions: []
 Cartridge-Vendor: getup
 Categories:
   - service
-  - domain_scope
 Website: http://aws.amazon.com/s3/
 Cart-Data:
   - Key: OPENSHIFT_S3_LOG_DIR
