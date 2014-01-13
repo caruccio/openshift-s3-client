@@ -5,6 +5,6 @@ case "$1" in
 		version="$2"
 esac
 
-source versions/${version:-0.0.1}/bin/request-s3-credentials
+source versions/${version:-0.0.1}/bin/aws-credentials
 
 create-s3-iam-user

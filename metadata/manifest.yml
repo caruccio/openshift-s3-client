@@ -1,7 +1,7 @@
-Name: s3-client
-Cartridge-Short-Name: S3_CLIENT
-Display-Name: Amazon S3 Client
-Description: "Privides credentials to AWS S3"
+Name: aws-s3-client
+Cartridge-Short-Name: AWS_S3_CLIENT
+Display-Name: Amazon Web Services S3 Client
+Description: "Privides credentials for AWS S3"
 Version: '0.0.1'
 Versions: [ '0.0.1' ]
 License: "Apache License version 2.0"
@@ -14,23 +14,23 @@ Categories:
   - service
 Website: http://aws.amazon.com/s3/
 Cart-Data:
-  - Key: OPENSHIFT_S3_LOG_DIR
+  - Key: OPENSHIFT_AWS_S3_LOG_DIR
     Type: environment
     Description: "Directory containing log files."
-  - Key: OPENSHIFT_AWS_ACCESS_KEY_ID
+  - Key: OPENSHIFT_AWS_S3_ACCESS_KEY_ID
     Type: environment
     Description: "Provides the value of the AWS access key."
-  - Key: OPENSHIFT_AWS_SECRET_ACCESS_KEY
+  - Key: OPENSHIFT_AWS_S3_SECRET_ACCESS_KEY
     Type: environment
     Description: "Provides the value of the AWS secret access key."
-  - Key: OPENSHIFT_AWS_BUCKET_NAME
+  - Key: OPENSHIFT_AWS_S3_BUCKET_NAME
     Type: environment
     Description: "Provides the S3 bucket name."
 Provides:
-  - "s3client"
-  - s3client-0.0.1
+  - "awss3client"
+  - awss3client-0.0.1
 Publishes:
-  publish-s3-credentials:
+  publish-aws-s3-credentials:
     Type: ENV:NET_TCP:aws:s3:credentials
 Scaling:
   Min: 1
