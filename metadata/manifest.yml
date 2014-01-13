@@ -29,6 +29,9 @@ Cart-Data:
 Provides:
   - "s3client"
   - s3client-0.0.1
+Publishes:
+  publish-s3-credentials:
+    Type: ENV:NET_TCP:aws:s3:credentials
 Scaling:
   Min: 1
   Max: 1
