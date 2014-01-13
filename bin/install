@@ -8,6 +8,7 @@ esac
 source versions/${version:-0.0.1}/bin/request-s3-credentials
 
 if create-s3-iam-user; then
+	/bin/ls -la env >&2
 	cat <<-EOF
 		Your AWS S3 credentials:
 

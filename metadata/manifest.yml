@@ -17,15 +17,15 @@ Cart-Data:
   - Key: OPENSHIFT_S3_LOG_DIR
     Type: environment
     Description: "Directory containing log files."
-  - Key: AWS_DEFAULT_REGION
-    Type: environment
-    Description: "Provides the AWS region to use."
-  - Key: AWS_ACCESS_KEY_ID
+  - Key: OPENSHIFT_AWS_ACCESS_KEY_ID
     Type: environment
     Description: "Provides the value of the AWS access key."
-  - Key: AWS_SECRET_ACCESS_KEY
+  - Key: OPENSHIFT_AWS_SECRET_ACCESS_KEY
     Type: environment
     Description: "Provides the value of the AWS secret access key."
+  - Key: OPENSHIFT_AWS_BUCKET_NAME
+    Type: environment
+    Description: "Provides the S3 bucket name.
 Provides:
   - "s3client"
   - s3client-0.0.1
