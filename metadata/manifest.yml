@@ -25,7 +25,7 @@ Cart-Data:
     Description: "Provides the value of the AWS secret access key."
   - Key: OPENSHIFT_AWS_BUCKET_NAME
     Type: environment
-    Description: "Provides the S3 bucket name.
+    Description: "Provides the S3 bucket name."
 Provides:
   - "s3client"
   - s3client-0.0.1
