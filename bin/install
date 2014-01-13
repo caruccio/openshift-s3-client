@@ -5,7 +5,7 @@ case "$1" in
 		version="$2"
 esac
 
-source bin/${version:-0.0.1}/bin/request-s3-credentials
+source versions/${version:-0.0.1}/bin/request-s3-credentials
 
 if create-s3-iam-user; then
 	echo "ENV_VAR_ADD OPENSHIFT_AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID"
