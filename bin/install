@@ -9,13 +9,13 @@ esac
 
 ls -la env >&2
 client_result 'Your AWS S3 credentials environment variables:'
-#client_result ' '
-#client_result "OPENSHIFT_AWS_S3_ACCESS_KEY_ID:     $OPENSHIFT_AWS_S3_ACCESS_KEY_ID"
-#client_result "OPENSHIFT_AWS_S3_SECRET_ACCESS_KEY: $OPENSHIFT_AWS_S3_SECRET_ACCESS_KEY"
-#client_result "OPENSHIFT_AWS_S3_REGION:            $OPENSHIFT_AWS_S3_REGION"
-#client_result "OPENSHIFT_AWS_S3_ENDPOINT:          $OPENSHIFT_AWS_S3_ENDPOINT"
-#client_result "OPENSHIFT_AWS_S3_BUCKET_NAME:       $OPENSHIFT_AWS_S3_BUCKET_NAME"
-#client_result "OPENSHIFT_AWS_S3_URL:               $OPENSHIFT_AWS_S3_URL"
+client_result ' '
+client_result "OPENSHIFT_AWS_S3_ACCESS_KEY_ID:     $OPENSHIFT_AWS_S3_ACCESS_KEY_ID"
+client_result "OPENSHIFT_AWS_S3_SECRET_ACCESS_KEY: $OPENSHIFT_AWS_S3_SECRET_ACCESS_KEY"
+client_result "OPENSHIFT_AWS_S3_REGION:            $OPENSHIFT_AWS_S3_REGION"
+client_result "OPENSHIFT_AWS_S3_ENDPOINT:          $OPENSHIFT_AWS_S3_ENDPOINT"
+client_result "OPENSHIFT_AWS_S3_BUCKET_NAME:       $OPENSHIFT_AWS_S3_BUCKET_NAME"
+client_result "OPENSHIFT_AWS_S3_URL:               $OPENSHIFT_AWS_S3_URL"
 client_result ' '
 client_result '!! WARNING !! WARNING !! WARNING !!'
 client_result ' '
