@@ -40,6 +40,8 @@ For example, to request a AWS S3 credential the request URL should be:
 https:/<server-addr>/aws/s3
 ```
 
+It is a good practice to use a separated user to handle AIM user creation. Avoid using your main AWS account.
+
 ### Authentication
 
 Upon installation, S3C creates a file inside the main app gear containing a random generated salt, used to sign the request.
@@ -75,10 +77,10 @@ This service allows for a main account to create different credentials for diffe
 
 To create a new user credential:
 
-- Using vendor's credentials, request a new IAM user and access key.
-- Attach restrictive policy to new user, allowing S3 access only without bucket delete permission.
+- Using CS account (see Credential Server above), request a new IAM user and access key.
+- Attach restrictive policy to new user, with S3 access only, without bucket delete permission and tag creation permission (important).
 - Register this new resource for billing (maybe into mongodb usage_record?)
-- Return username, access key and bucket name.
+- Return username, access keys and bucket name.
 
 Example routine to create IAM user and key:
 
@@ -127,7 +129,6 @@ def create_aim_user(vendor_key_id, vendor_access_key, openshift_app_uuid):
 					"s3:PutBucketNotification",
 					"s3:PutBucketPolicy",
 					"s3:PutBucketRequestPayment",
-					"s3:PutBucketTagging",
 					"s3:PutBucketVersioning",
 					"s3:PutBucketWebsite",
 					"s3:PutLifecycleConfiguration",
@@ -143,3 +144,10 @@ def create_aim_user(vendor_key_id, vendor_access_key, openshift_app_uuid):
 	}
 	client.put_user_policy(openshift_app_uuid, 'default', dumps(policy, indent=3))
 ```
+
+### Bucket Tagging and Billing
+
+To keep track of openshift users on AWS billing, each bucket must be tagged. This tag appears on [AWS billing cost allocation](http://docs.aws.amazon.com/awsaccountbilling/latest/about/getbill.html#allocation) and is used to identify a single bucket for a single AIM account. You must activate this report in order to have programmatic access to billing reports from AWS.
+
+By adding the same tag name to all user buckets, it is easy to split cost usage separated by user. Tags are not shown on billing reports by default, so you must first manually [activate it for billing](https://portal.aws.amazon.com/gp/aws/developer/account?ie=UTF8&action=cost-allocation-report). First, of course, at least one tag must exists.
+
