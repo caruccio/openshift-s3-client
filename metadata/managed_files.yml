@@ -1,5 +1,6 @@
 ---
 locked_files:
+- .message
 - bin/
 - bin/*
 - env/*

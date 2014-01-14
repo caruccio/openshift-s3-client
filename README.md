@@ -49,13 +49,13 @@ The request itself is a plain text POST containing some environment variables fr
 The format of the message is as follow:
 
 ```
-$OPENSHIFT_GEAR_UUID|$OPENSHIFT_APP_DNS|$OPENSHIFT_S3_CLIENT_DIR|<MESSAGE-HASH>
+$OPENSHIFT_APP_UUID|$OPENSHIFT_APP_DNS|$OPENSHIFT_S3_CLIENT_DIR|<MESSAGE-HASH>
 ```
 
 For example, given following salt value `SALT=d72ebd92de8230e4`, one can generate <MESSAGE-HASH> with:
 
 ```
-echo "$OPENSHIFT_GEAR_UUID|$OPENSHIFT_APP_DNS|$OPENSHIFT_S3_CLIENT_DIR|$SALT" | sha256sum
+echo "$OPENSHIFT_APP_UUID|$OPENSHIFT_APP_DNS|$OPENSHIFT_S3_CLIENT_DIR|$SALT" | sha256sum
 8b7b830cd1ec536a5f681947c3b28857d63845fcc07eb0ddf57d12fe2ce20137 -
 ```
 
