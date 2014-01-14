@@ -19,5 +19,5 @@ client_result "OPENSHIFT_AWS_S3_URL:               $OPENSHIFT_AWS_S3_URL"
 client_result ' '
 client_result '!! WARNING !! WARNING !! WARNING !!'
 client_result ' '
-client_result 'If your delete this app, all files stored in this S3 bucket will be permanently lost.'
+client_result 'If your delete this app, all files stored in this S3 bucket will be permanently lost (some day).'
 client_result ' '
