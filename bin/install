@@ -1,13 +1,16 @@
 #!/bin/bash -eu
 
 source $OPENSHIFT_CARTRIDGE_SDK_BASH
+source versions/${version:-0.0.1}/bin/aws-credentials
 
 case "$1" in
 	-v|--version)
 		version="$2"
 esac
 
-ls -la env >&2
+#create-s3-iam-user "$AUTH_TOKEN"
+
+client_result "Auth token: $AUTH_TOKEN"
 client_result 'Your AWS S3 credentials environment variables:'
 client_result ' '
 client_result "OPENSHIFT_AWS_S3_ACCESS_KEY_ID:     $OPENSHIFT_AWS_S3_ACCESS_KEY_ID"

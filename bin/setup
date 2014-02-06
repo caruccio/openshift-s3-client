@@ -1,14 +1,15 @@
 #!/bin/bash -eu
 
+source $OPENSHIFT_CARTRIDGE_SDK_BASH
+
 case "$1" in
 	-v|--version)
 		version="$2"
 esac
 
-source versions/${version:-0.0.1}/bin/aws-credentials
-
-if ! [ ${AWS_S3_SALT+x} ]; then
-	cat /dev/urandom | head -c 32 | sha256sum | base64 | head -c 40 > env/AWS_S3_SALT
+if [ -z "$AUTH_TOKEN" ]; then
+	echo Generating auth token...
+	AUTH_TOKEN=`cat /dev/urandom | head -c 32 | sha256sum | base64 | head -c 40`
+	echo $AUTH_TOKEN > env/AUTH_TOKEN
+	cart_props "auth_token=$AUTH_TOKEN"
 fi
-
-create-s3-iam-user || exit 1
